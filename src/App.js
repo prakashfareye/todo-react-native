@@ -8,6 +8,8 @@
 
 import React, {useState} from 'react';
 import {Node} from 'react';
+import {NavigationContainer, StackActions} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
   SafeAreaView,
   ScrollView,
@@ -28,6 +30,10 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import Login from './components/Login';
+import Todos from './components/Todos';
+import AddTodo from './components/AddTodo';
+
+const Stack = createNativeStackNavigator();
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -42,13 +48,26 @@ const App = () => {
   });
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <Login />
-    </SafeAreaView>
+    // <SafeAreaView style={backgroundStyle}>
+    //   <StatusBar
+    //     barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+    //     backgroundColor={backgroundStyle.backgroundColor}
+    //   />
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{header: () => null}}
+        />
+        <Stack.Screen
+          name="Todos"
+          component={Todos}
+          options={{header: () => null}}
+        />
+        <Stack.Screen name="AddTodo" component={AddTodo} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 
