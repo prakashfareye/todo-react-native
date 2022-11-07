@@ -43,13 +43,8 @@ const Login = ({navigation}) => {
   const [role, setRole] = useState('');
   const [githubId, setGithubId] = useState('');
 
-  const SavedCredential = {
-    email: 'p@gmail.com',
-    password: 'abcdefghi',
-  };
-
   useEffect(() => {
-    console.log('use Effect called in Todos');
+    //console.log('use Effect called in Todos');
     // getTodosFromAsyncStorage();
     //console.log('todos loaded from useEffect', todos);
     getUserDetailFromAsyncSrorage();
@@ -104,7 +99,7 @@ const Login = ({navigation}) => {
     })
       .then(response => response.json())
       .then(res => {
-        console.log(res);
+        //console.log(res);
         //save returned user detail to Async Storage
         saveUserToAsyncStorage(res);
         // save emapty todos to Async Storage
@@ -165,7 +160,7 @@ const Login = ({navigation}) => {
         // We have data!!
         // navigate to todos page
         navigation.navigate('Todos');
-        console.log('from AS Todos fetching Saved User', JSON.parse(value));
+        //console.log('from AS Todos fetching Saved User', JSON.parse(value));
       }
     } catch (error) {
       // Error retrieving data

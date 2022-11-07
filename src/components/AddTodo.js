@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Node} from 'react';
 import {NavigationContainer, StackActions} from '@react-navigation/native';
+import saveToRealm from '../database/Realm';
 
 import {
   StyleSheet,
@@ -29,16 +30,22 @@ const AddTodo = ({navigation}) => {
   const [dateValidError, setDateValidError] = useState('');
 
   useEffect(() => {
-    console.log('use Effect called in Todos');
+    //console.log('use Effect called in Todos');
     // getTodosFromAsyncStorage();
     getFromAsync();
   }, []);
 
-  useEffect(() => {
-    console.log('use Effect called in Todos');
-    // getTodosFromAsyncStorage();
-    validateDate();
-  });
+  //   useEffect(() => {
+  //     console.log('use Effect called in Todos');
+  //     // getTodosFromAsyncStorage();
+  //     validateDate();
+  //   });
+
+  //////////////////////////////
+  const saveTodoToRealm = () => {
+    saveToRealm(2, title, description, dueDate, 'open');
+  };
+  //////////////////////
 
   const onDateChange = (evant, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -198,10 +205,11 @@ const AddTodo = ({navigation}) => {
       <TouchableOpacity style={styles.loginButton} onPress={saveTodo}>
         <Text style={styles.buttonText}> Save Todo</Text>
       </TouchableOpacity>
-      {/* <TouchableOpacity
-        style={styles.loginButton}
-        onPress={getFromAsyncWithoutUpdatingtodos}>
-        <Text style={styles.buttonText}> Check Todo</Text>
+      <TouchableOpacity style={styles.loginButton} onPress={saveTodoToRealm}>
+        <Text style={styles.buttonText}> Save Realm</Text>
+      </TouchableOpacity>
+      {/* <TouchableOpacity style={styles.loginButton} onPress={readFromRealm}>
+        <Text style={styles.buttonText}> Read Realm</Text>
       </TouchableOpacity> */}
     </View>
   );
