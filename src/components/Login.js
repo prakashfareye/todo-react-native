@@ -38,8 +38,8 @@ const Login = ({navigation}) => {
   const [seePassword, setSeePassword] = useState(true);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('p4@gmail.com');
+  const [password, setPassword] = useState('abcdefghi');
   const [role, setRole] = useState('');
   const [githubId, setGithubId] = useState('');
 

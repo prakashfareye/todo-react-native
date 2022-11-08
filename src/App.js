@@ -32,6 +32,7 @@ import {
 import Login from './components/Login';
 import Todos from './components/Todos';
 import AddTodo from './components/AddTodo';
+import RealmTesting from './RealmTesting';
 
 const Stack = createNativeStackNavigator();
 
@@ -66,6 +67,7 @@ const App = () => {
           options={{header: () => null}}
         />
         <Stack.Screen name="AddTodo" component={AddTodo} />
+        <Stack.Screen name="Realm Testing" component={RealmTesting} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,4 +1,4 @@
-const Tasks = {
+const TaskSchema = {
   name: 'Task',
   properties: {
     _id: 'int',
@@ -10,4 +10,4 @@ const Tasks = {
   primaryKey: '_id',
 };
 
-export default Tasks;
+export default TaskSchema;

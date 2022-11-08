@@ -109,7 +109,8 @@ const Todos = ({navigation}) => {
         <View style={styles.topContainer}>
           <View style={styles.headerContainer}>
             <View style={styles.header}>
-              <Text style={styles.headerText}>{`Todo List`}</Text>
+              <Text
+                style={styles.headerText}>{`Hello, ${user.firstName}`}</Text>
             </View>
           </View>
         </View>
@@ -119,10 +120,10 @@ const Todos = ({navigation}) => {
               <Text style={styles.tabItemText}>Todo</Text>
             </View>
             <View>
-              <Text style={styles.tabItemText}>Done</Text>
+              <Text style={styles.tabItemTextDone}>Done</Text>
             </View>
             <View>
-              <Text style={styles.tabItemText}>Doing</Text>
+              <Text style={styles.tabItemTextDoing}>Doing</Text>
             </View>
           </View>
           <View style={styles.flatListContainer}>
@@ -144,8 +145,9 @@ const Todos = ({navigation}) => {
             onPress={() => {
               console.log('on Press of Add Todo');
               navigation.navigate('AddTodo');
+              //navigation.navigate('Realm Testing');
             }}>
-            <Text style={styles.buttonText}>Add Todo</Text>
+            <Text style={styles.buttonText}>+</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -161,6 +163,7 @@ const styles = StyleSheet.create({
     //flexDirection: 'column',
     height: '100%',
     width: '100%',
+    paddingTop: 0,
   },
   topContainer: {
     flex: 1,
@@ -188,11 +191,12 @@ const styles = StyleSheet.create({
   flatListContainer: {
     //height: '92%',
     backgroundColor: '#F9F3FC',
+    marginTop: 50,
     //paddingEnd: 5,
   },
   tabContainer: {
     width: '80%',
-    position: 'relative',
+    position: 'absolute',
     height: 80,
     top: -45,
     elevation: 5,
@@ -210,6 +214,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
+  },
+  tabItemTextDone: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#CCC',
+  },
+  tabItemTextDoing: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#CCC',
   },
   header: {
     height: 60,
@@ -231,18 +245,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 10,
-    width: 100,
-    height: 40,
+    width: 60,
+    backgroundColor: '#3D0DAD',
+    height: 60,
     position: 'absolute',
-    top: 540,
-    left: 270,
+    top: 520,
+    left: 300,
     color: '#FFFFFF',
-    borderRadius: 10,
-    backgroundColor: '#8E0082',
+    borderRadius: 100,
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: 25,
+    alignItems: 'center',
   },
   noTodos: {
     justifyContent: 'center',

@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {Node} from 'react';
 import {NavigationContainer, StackActions} from '@react-navigation/native';
-import saveToRealm from '../database/Realm';
+import Realm from 'realm';
+import {TaskSchema} from '../database/schema/TaskSchema';
 
 import {
   StyleSheet,
@@ -19,6 +20,8 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// schema for database objects
+
 const AddTodo = ({navigation}) => {
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
@@ -35,16 +38,66 @@ const AddTodo = ({navigation}) => {
     getFromAsync();
   }, []);
 
-  //   useEffect(() => {
-  //     console.log('use Effect called in Todos');
-  //     // getTodosFromAsyncStorage();
-  //     validateDate();
-  //   });
+  // useEffect(() => {
+  //   //console.log('use Effect called in Todos');
+  //   // getTodosFromAsyncStorage();
+  //   validateDate();
+  // });
+
+  /**Realm DB Part Starts */
+  // realm related variables
+  const [realm, setRealm] = React.useState(null);
+  const [tasks, setTasks] = React.useState([]);
+
+  useEffect(() => {
+    (async () => {
+      // initialize realm...
+      const realm = await Realm.open({
+        path: 'myrealm',
+        schema: [TaskSchema],
+      }).then(realm => {
+        // load data in the database...
+        const tasks = realm.objects('Task');
+
+        // set variable for tasks read from database
+        setTasks([...tasks]);
+
+        // get realm instance to use later in app
+        setRealm(realm);
+
+        // set up listener to update task list when the
+        // data is updated
+        try {
+          tasks.addListener(() => {
+            setTasks([...tasks]);
+          });
+        } catch (error) {
+          console.error(`Error updating tasks: ${error}`);
+        }
+      });
+    })();
+  }, []);
+
+  let task1;
+  const adddTask = () => {
+    realm.write(() => {
+      task1 = realm.create('Task', {
+        _id: Date.now(),
+        title: title,
+        description: description,
+        dueDate: dueDate,
+        status: 'open',
+      });
+    });
+    // reset react states
+  };
+
+  /**Realm DB Part Ends */
 
   //////////////////////////////
-  const saveTodoToRealm = () => {
-    saveToRealm(2, title, description, dueDate, 'open');
-  };
+  // const saveTodoToRealm = () => {
+  //   saveToRealm(2, title, description, dueDate, 'open');
+  // };
   //////////////////////
 
   const onDateChange = (evant, selectedDate) => {
@@ -203,14 +256,24 @@ const AddTodo = ({navigation}) => {
         <Text style={styles.errorText}>{dateValidError}</Text>
       ) : null}
       <TouchableOpacity style={styles.loginButton} onPress={saveTodo}>
-        <Text style={styles.buttonText}> Save Todo</Text>
+        <Text style={styles.buttonText}> Save Todo To AS</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.loginButton} onPress={saveTodoToRealm}>
-        <Text style={styles.buttonText}> Save Realm</Text>
+      <TouchableOpacity
+        style={styles.loginButton}
+        onPress={() => {
+          //
+          adddTask();
+        }}>
+        <Text style={styles.buttonText}> Save Todo To Realm</Text>
       </TouchableOpacity>
-      {/* <TouchableOpacity style={styles.loginButton} onPress={readFromRealm}>
-        <Text style={styles.buttonText}> Read Realm</Text>
-      </TouchableOpacity> */}
+      <TouchableOpacity
+        style={styles.loginButton}
+        onPress={() => {
+          //
+          console.log('From Realm', tasks);
+        }}>
+        <Text style={styles.buttonText}> Get From Realm</Text>
+      </TouchableOpacity>
     </View>
   );
 };
