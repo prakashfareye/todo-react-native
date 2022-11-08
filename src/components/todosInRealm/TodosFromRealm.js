@@ -30,21 +30,26 @@ import Realm from 'realm';
 
 // schema for database objects
 const TaskSchema = {
-  name: 'Task',
+  name: 'Task1',
   properties: {
     _id: 'int',
     name: 'string',
+    description: 'string',
+    dueDate: 'string',
     status: 'string?',
   },
   primaryKey: '_id',
 };
 
-const RealmTesting = () => {
+const TodosFromRealm = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
   const theme = useTheme();
 
   // input fields data
   const [text, setText] = React.useState('');
+  const [description, setDescription] = React.useState('');
+  const [date, setDate] = React.useState('');
+
   const [status, setStatus] = React.useState('checked');
 
   // realm related variables
@@ -55,11 +60,11 @@ const RealmTesting = () => {
     (async () => {
       // initialize realm...
       const realm = await Realm.open({
-        path: 'myrealm',
+        path: 'myrealm1',
         schema: [TaskSchema],
       }).then(realm => {
         // load data in the database...
-        const tasks = realm.objects('Task');
+        const tasks = realm.objects('Task1');
 
         // set variable for tasks read from database
         setTasks([...tasks]);
@@ -87,7 +92,7 @@ const RealmTesting = () => {
   const deleteTask = task => {
     realm.write(() => {
       try {
-        let myTask = realm.objectForPrimaryKey('Task', task._id);
+        let myTask = realm.objectForPrimaryKey('Task1', task._id);
         realm.delete(myTask);
         myTask = null;
         realm.refresh();
@@ -101,13 +106,14 @@ const RealmTesting = () => {
    * get the values from the local state and add a new
    * task to the database
    */
-  let task1;
+  let task;
   const adddTask = () => {
     realm.write(() => {
-      task1 = realm.create('Task', {
+      task = realm.create('Task1', {
         _id: Date.now(),
         name: text,
-        dateCreated: Date.now(),
+        description: description,
+        dueDate: date,
         status: status == 'checked' ? 'Closed' : 'Open',
       });
     });
@@ -133,15 +139,28 @@ const RealmTesting = () => {
               padding: 8,
               flexDirection: 'row',
             }}>
-            <View style={{flex: 1}}>
+            {/* <View style={{flex: 1}}>
               <TextInput
-                label="Task"
+                label="Task Title"
                 value={text}
                 onChangeText={text => setText(text)}
                 style={{backgroundColor: 'transparent'}}
               />
-            </View>
-            <View style={{marginTop: 20, marginLeft: 12}}>
+              <TextInput
+                label="Task Description"
+                value={description}
+                onChangeText={text => setDescription(text)}
+                style={{backgroundColor: 'transparent'}}
+              />
+              <TextInput
+                label="Task Date"
+                value={date}
+                onChangeText={text => setDate(text)}
+                style={{backgroundColor: 'transparent'}}
+              />
+            </View> */}
+
+            {/* <View style={{marginTop: 20, marginLeft: 12}}>
               <ToggleButton
                 size={18}
                 style={{
@@ -161,7 +180,7 @@ const RealmTesting = () => {
                   setStatus(status === 'checked' ? 'unchecked' : 'checked')
                 }
               />
-            </View>
+            </View> */}
           </View>
 
           <View style={{alignItems: 'center'}}>
@@ -170,7 +189,10 @@ const RealmTesting = () => {
               mode="contained"
               style={{width: 200}}
               uppercase
-              onPress={() => adddTask()}>
+              onPress={() => {
+                //
+                navigation.navigate('Add Todo realm');
+              }}>
               Add Task
             </Button>
           </View>
@@ -214,4 +236,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RealmTesting;
+export default TodosFromRealm;

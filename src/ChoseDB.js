@@ -12,7 +12,7 @@ import {
   Image,
 } from 'react-native';
 
-const ChoseDB = () => {
+const ChoseDB = ({navigation}) => {
   return (
     <View>
       <TouchableOpacity
@@ -20,6 +20,7 @@ const ChoseDB = () => {
         onPress={() => {
           //
           //
+          navigation.navigate('Todos');
         }}>
         <Text style={styles.buttonText}> Use Async Storage</Text>
       </TouchableOpacity>
@@ -28,6 +29,7 @@ const ChoseDB = () => {
         onPress={() => {
           //
           //onsole.log('From Realm', tasks);
+          navigation.navigate('Realm Db');
         }}>
         <Text style={styles.buttonText}> Use Realm Db</Text>
       </TouchableOpacity>
@@ -48,5 +50,9 @@ const styles = StyleSheet.create({
     marginLeft: 40,
     marginEnd: 40,
     marginTop: 50,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 15,
   },
 });

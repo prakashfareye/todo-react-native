@@ -32,7 +32,10 @@ import {
 import Login from './components/Login';
 import Todos from './components/Todos';
 import AddTodo from './components/AddTodo';
-import RealmTesting from './RealmTesting';
+import TodosFromRealm from './components/todosInRealm/TodosFromRealm';
+import AddTodorealm from './components/todosInRealm/AddTodorealm';
+
+import ChoseDB from './ChoseDB';
 
 const Stack = createNativeStackNavigator();
 
@@ -67,7 +70,9 @@ const App = () => {
           options={{header: () => null}}
         />
         <Stack.Screen name="AddTodo" component={AddTodo} />
-        <Stack.Screen name="Realm Testing" component={RealmTesting} />
+        <Stack.Screen name="Choose db" component={ChoseDB} />
+        <Stack.Screen name="Realm Db" component={TodosFromRealm} />
+        <Stack.Screen name="Add Todo realm" component={AddTodorealm} />
       </Stack.Navigator>
     </NavigationContainer>
   );

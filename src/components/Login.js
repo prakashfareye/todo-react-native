@@ -107,7 +107,7 @@ const Login = ({navigation}) => {
           .then(json => console.log('Empty Todos creation in AS success!'))
           .catch(error => console.log('Empty Todos creation in AS error!'));
         // navigate to todos page
-        navigation.navigate('Todos');
+        navigation.navigate('Choose db');
       })
       .catch(error => console.log('fetchToken error: ', error));
   };
@@ -159,7 +159,7 @@ const Login = ({navigation}) => {
       if (value !== null) {
         // We have data!!
         // navigate to todos page
-        navigation.navigate('Todos');
+        navigation.navigate('Choose db');
         //console.log('from AS Todos fetching Saved User', JSON.parse(value));
       }
     } catch (error) {
