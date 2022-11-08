@@ -8,7 +8,6 @@
 
 import React, {useEffect} from 'react';
 import {
-  Pressable,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -16,15 +15,18 @@ import {
   Text,
   useColorScheme,
   View,
-} from 'react-native';
-import {
-  Button,
   TextInput,
-  ToggleButton,
-  Colors,
-  useTheme,
-  List,
-} from 'react-native-paper';
+  Button,
+  TouchableOpacity,
+  ToastAndroid,
+  Platform,
+  AlertIOS,
+  Image,
+  FlatList,
+} from 'react-native';
+
+import {Colors} from 'react-native/Libraries/NewAppScreen';
+import ListItem from '../ListItem';
 
 import Realm from 'realm';
 
@@ -42,8 +44,11 @@ const TaskSchema = {
 };
 
 const TodosFromRealm = ({navigation}) => {
+  const backgroundStyle = {
+    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  };
   const isDarkMode = useColorScheme() === 'dark';
-  const theme = useTheme();
+  // const theme = useTheme();
 
   // input fields data
   const [text, setText] = React.useState('');
@@ -123,116 +128,261 @@ const TodosFromRealm = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          {/* text input view */}
-          <View
-            style={{
-              flex: 1,
-              marginVertical: 10,
-              marginHorizontal: 8,
-              padding: 8,
-              flexDirection: 'row',
-            }}>
-            {/* <View style={{flex: 1}}>
-              <TextInput
-                label="Task Title"
-                value={text}
-                onChangeText={text => setText(text)}
-                style={{backgroundColor: 'transparent'}}
-              />
-              <TextInput
-                label="Task Description"
-                value={description}
-                onChangeText={text => setDescription(text)}
-                style={{backgroundColor: 'transparent'}}
-              />
-              <TextInput
-                label="Task Date"
-                value={date}
-                onChangeText={text => setDate(text)}
-                style={{backgroundColor: 'transparent'}}
-              />
-            </View> */}
-
-            {/* <View style={{marginTop: 20, marginLeft: 12}}>
-              <ToggleButton
-                size={18}
-                style={{
-                  width: 25,
-                  height: 25,
-                  justifyContent: 'center',
-                  marginVertical: 8,
-                  borderColor: theme.colors.primary,
-                  borderWidth: 1,
-                  backgroundColor:
-                    status === 'checked' ? theme.colors.primary : '',
-                }}
-                icon={status === 'checked' ? 'check' : undefined}
-                value="complete"
-                status={status}
-                onPress={() =>
-                  setStatus(status === 'checked' ? 'unchecked' : 'checked')
-                }
-              />
-            </View> */}
-          </View>
-
-          <View style={{alignItems: 'center'}}>
-            <Button
-              raised
-              mode="contained"
-              style={{width: 200}}
-              uppercase
-              onPress={() => {
-                //
-                navigation.navigate('Add Todo realm');
-              }}>
-              Add Task
-            </Button>
-          </View>
-          <View>
-            {tasks?.map(task => (
-              <List.Item
-                key={task._id}
-                title={props => <Text style={{...props}}>{task.name}</Text>}
-                description={task.status}
-                left={props => <List.Icon {...props} icon="folder" />}
-                right={props => (
-                  <Pressable onPress={() => deleteTask(task)}>
-                    <List.Icon {...props} icon="delete" color={Colors.red400} />
-                  </Pressable>
-                )}
-              />
-            ))}
+    <SafeAreaView style={backgroundStyle}>
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={backgroundStyle.backgroundColor}
+      />
+      <View style={styles.container}>
+        <View style={styles.topContainer}>
+          <View style={styles.headerContainer}>
+            <View style={styles.header}>
+              <Text style={styles.headerText}>{`Hello, Prakash`}</Text>
+            </View>
           </View>
         </View>
-      </ScrollView>
+        <View style={styles.bottomContainer}>
+          <View style={styles.tabContainer}>
+            <View>
+              <Text style={styles.tabItemText}>Todo</Text>
+            </View>
+            <View>
+              <Text style={styles.tabItemTextDone}>Done</Text>
+            </View>
+            <View>
+              <Text style={styles.tabItemTextDoing}>Doing</Text>
+            </View>
+          </View>
+          <View style={styles.flatListContainer}>
+            {tasks.length === 0 && (
+              <View style={styles.noTodos}>
+                <Text style={styles.noTodosText}>No Todos.</Text>
+              </View>
+            )}
+            <FlatList
+              data={tasks}
+              renderItem={({item}) => {
+                //console.log('inside flat List', item);
+                return (
+                  <View style={styles.listContainer}>
+                    <View style={styles.listItem}>
+                      <View style={styles.imageView}>
+                        <Image
+                          source={require('../../assets/suitcase.png')}
+                          style={styles.icon}
+                          onPress={() => {
+                            //
+                          }}
+                        />
+                      </View>
+                      <View style={styles.textBox}>
+                        <View style={styles.titleBox}>
+                          <Text style={styles.todoTitle}>{item.name}</Text>
+                          <Text style={styles.todoDueDate}>{item.dueDate}</Text>
+                        </View>
+                        <View style={styles.descriptionBox}>
+                          <Text style={styles.descriptionText}>
+                            {item.description}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                );
+              }}
+            />
+          </View>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => {
+              navigation.navigate('Add Todo realm');
+            }}>
+            <Text style={styles.buttonText}>+</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    backgroundColor: '#F9F3FC',
+    //flexDirection: 'column',
+    height: '100%',
+    width: '100%',
+    paddingTop: 0,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  topContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
+    backgroundColor: '#3D0DAD',
   },
-  sectionDescription: {
-    marginTop: 8,
+  bottomContainer: {
+    flex: 4,
+    //backgroundColor: '',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowRadius: 10,
+    shadowOpacity: 2.0,
+  },
+  headerContainer: {
+    width: '100%',
+  },
+  flatListContainer: {
+    //height: '92%',
+    backgroundColor: '#F9F3FC',
+    marginTop: 50,
+    //paddingEnd: 5,
+  },
+  tabContainer: {
+    width: '80%',
+    position: 'absolute',
+    height: 80,
+    top: -45,
+    elevation: 5,
+    //marginEnd: 40,
+    marginLeft: 40,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    //marginRight: 40,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    padding: 25,
+  },
+  tabItemText: {
     fontSize: 18,
-    fontWeight: '400',
+    fontWeight: 'bold',
+    color: '#000',
   },
-  highlight: {
-    fontWeight: '700',
+  tabItemTextDone: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#CCC',
+  },
+  tabItemTextDoing: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#CCC',
+  },
+  header: {
+    height: 60,
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingStart: 20,
+    paddingEnd: 20,
+    marginTop: 10,
+  },
+  headerText: {
+    fontSize: 20,
+    paddingTop: 0,
+    fontWeight: 'bold',
+    color: '#FFF',
+  },
+  loginButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    width: 60,
+    backgroundColor: '#3D0DAD',
+    height: 60,
+    position: 'absolute',
+    top: 520,
+    left: 300,
+    color: '#FFFFFF',
+    borderRadius: 100,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 25,
+    alignItems: 'center',
+  },
+  noTodos: {
+    justifyContent: 'center',
+    alignContent: 'center',
+  },
+  noTodosText: {
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 25,
+    color: '#000',
+    marginTop: 20,
+  },
+  listContainer: {
+    width: '94%',
+    height: 80,
+    shadowColor: '#000',
+    shadowRadius: 10,
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    elevation: 3,
+    marginTop: 5,
+    marginBottom: 5,
+    marginLeft: 12,
+  },
+  listItem: {
+    //backgroundColor: '#F9F3FC',
+
+    flex: 1,
+    borderRadius: 10,
+    direction: 'flex',
+    flexDirection: 'row',
+  },
+  imageView: {
+    flex: 1.2,
+    //backgroundColor: '#CCC',
+    justifyContent: 'center',
+    alignContent: 'center',
+    paddingStart: 10,
+  },
+  icon: {
+    width: 50,
+    height: 50,
+    marginLeft: 8,
+  },
+  textBox: {
+    flex: 5,
+    //backgroundColor: '#F9F3FC',
+    flexDirection: 'column',
+    paddingLeft: 10,
+  },
+  titleBox: {
+    flex: 2,
+    //backgroundColor: '#FFF',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 5,
+    paddingEnd: 10,
+    marginEnd: 5,
+  },
+  descriptionBox: {
+    flex: 5,
+    paddingTop: 5,
+  },
+  todoTitle: {
+    fontWeight: 'bold',
+    color: '#000000',
+  },
+  todoDueDate: {
+    fontSize: 12,
+    color: '#000000',
+    marginEnd: 10,
+  },
+  descriptionText: {
+    fontSize: 11,
+    color: '#677182',
+    marginEnd: 10,
   },
 });
 

@@ -71,7 +71,11 @@ const App = () => {
         />
         <Stack.Screen name="AddTodo" component={AddTodo} />
         <Stack.Screen name="Choose db" component={ChoseDB} />
-        <Stack.Screen name="Realm Db" component={TodosFromRealm} />
+        <Stack.Screen
+          name="Realm Db"
+          component={TodosFromRealm}
+          options={{header: () => null}}
+        />
         <Stack.Screen name="Add Todo realm" component={AddTodorealm} />
       </Stack.Navigator>
     </NavigationContainer>
