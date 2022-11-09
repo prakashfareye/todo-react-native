@@ -32,17 +32,24 @@ const TaskSchema = {
   primaryKey: '_id',
 };
 
-const AddTodo = ({navigation}) => {
+const AddTodo = ({route, navigation}) => {
+  const {edit} = route.params;
+  const {taskToUpdate} = route.params;
+
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const [mode, setMode] = useState('date');
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [dueDate, setDueDate] = useState('');
+  const [title, setTitle] = useState(edit ? taskToUpdate.name : '');
+  const [description, setDescription] = useState(
+    edit ? taskToUpdate.description : '',
+  );
+  const [dueDate, setDueDate] = useState(edit ? taskToUpdate.dueDate : '');
+  const [status, setStatus] = React.useState(
+    edit ? taskToUpdate.status : 'Todo',
+  );
 
   const [dateValidError, setDateValidError] = useState('');
-  const [status, setStatus] = React.useState('checked');
 
   // realm related variables
   const [realm, setRealm] = React.useState(null);
@@ -78,6 +85,23 @@ const AddTodo = ({navigation}) => {
   }, []);
 
   /**
+   * deleting of tasks must happen in a transaction, we just
+   * need the id of the task to delete
+   */
+  const deleteTask = task => {
+    realm.write(() => {
+      try {
+        let myTask = realm.objectForPrimaryKey('Task1', task._id);
+        realm.delete(myTask);
+        myTask = null;
+        realm.refresh();
+      } catch (error) {
+        console.log('delete', error);
+      }
+    });
+  };
+
+  /**
    * get the values from the local state and add a new
    * task to the database
    */
@@ -89,7 +113,7 @@ const AddTodo = ({navigation}) => {
         name: title,
         description: description,
         dueDate: dueDate,
-        status: status == 'checked' ? 'Closed' : 'Open',
+        status: status,
       });
     });
 
@@ -97,6 +121,7 @@ const AddTodo = ({navigation}) => {
     setDescription('');
     setDueDate('');
     setStatus('');
+    navigation.dispatch(StackActions.pop(1));
   };
 
   const onDateChange = (evant, selectedDate) => {
@@ -160,6 +185,18 @@ const AddTodo = ({navigation}) => {
           setDescription(text);
         }}
       />
+      <TextInput
+        label="Status"
+        style={styles.textTitleBOx}
+        placeholder="Enter Todo Status"
+        placeholderTextColor="#CCCCCC"
+        multiline={false}
+        value={status}
+        onChangeText={text => {
+          //
+          setStatus(text);
+        }}
+      />
       <View style={styles.dueDateView}>
         <TextInput
           label="dueDate"
@@ -207,6 +244,20 @@ const AddTodo = ({navigation}) => {
         }}>
         <Text style={styles.buttonText}> Save Todo To Realm</Text>
       </TouchableOpacity>
+      {edit && (
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => {
+            // delete task
+            deleteTask(taskToUpdate);
+            navigation.dispatch(StackActions.pop(1));
+            // setTimeout(() => {
+
+            // }, 1000);
+          }}>
+          <Text style={styles.buttonText}> Delete Todo From Realm</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -224,10 +275,11 @@ const styles = StyleSheet.create({
     padding: 10,
     marginLeft: 20,
     marginRight: 20,
-    borderBottomWidth: 0.6,
+    borderBottomWidth: 1,
     underlineColor: '#000000',
     activeUnderlineColor: '#000000',
     paddingEnd: 25,
+    marginBottom: 5,
   },
   wrapperIcon: {
     position: 'absolute',
@@ -265,6 +317,17 @@ const styles = StyleSheet.create({
     marginLeft: 40,
     marginEnd: 40,
     marginTop: 50,
+  },
+  deleteButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    color: '#FFFFFF',
+    borderRadius: 10,
+    backgroundColor: '#960000',
+    marginLeft: 40,
+    marginEnd: 40,
+    marginTop: 20,
   },
   buttonText: {
     color: '#FFFFFF',

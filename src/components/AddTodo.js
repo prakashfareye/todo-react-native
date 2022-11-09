@@ -38,67 +38,11 @@ const AddTodo = ({navigation}) => {
     getFromAsync();
   }, []);
 
-  // useEffect(() => {
-  //   //console.log('use Effect called in Todos');
-  //   // getTodosFromAsyncStorage();
-  //   validateDate();
-  // });
-
-  /**Realm DB Part Starts */
-  // realm related variables
-  const [realm, setRealm] = React.useState(null);
-  const [tasks, setTasks] = React.useState([]);
-
   useEffect(() => {
-    (async () => {
-      // initialize realm...
-      const realm = await Realm.open({
-        path: 'myrealm',
-        schema: [TaskSchema],
-      }).then(realm => {
-        // load data in the database...
-        const tasks = realm.objects('Task');
-
-        // set variable for tasks read from database
-        setTasks([...tasks]);
-
-        // get realm instance to use later in app
-        setRealm(realm);
-
-        // set up listener to update task list when the
-        // data is updated
-        try {
-          tasks.addListener(() => {
-            setTasks([...tasks]);
-          });
-        } catch (error) {
-          console.error(`Error updating tasks: ${error}`);
-        }
-      });
-    })();
-  }, []);
-
-  let task1;
-  const adddTask = () => {
-    realm.write(() => {
-      task1 = realm.create('Task', {
-        _id: Date.now(),
-        title: title,
-        description: description,
-        dueDate: dueDate,
-        status: 'open',
-      });
-    });
-    // reset react states
-  };
-
-  /**Realm DB Part Ends */
-
-  //////////////////////////////
-  // const saveTodoToRealm = () => {
-  //   saveToRealm(2, title, description, dueDate, 'open');
-  // };
-  //////////////////////
+    //console.log('use Effect called in Todos');
+    // getTodosFromAsyncStorage();
+    validateDate();
+  });
 
   const onDateChange = (evant, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -257,22 +201,6 @@ const AddTodo = ({navigation}) => {
       ) : null}
       <TouchableOpacity style={styles.loginButton} onPress={saveTodo}>
         <Text style={styles.buttonText}> Save Todo To AS</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.loginButton}
-        onPress={() => {
-          //
-          adddTask();
-        }}>
-        <Text style={styles.buttonText}> Save Todo To Realm</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.loginButton}
-        onPress={() => {
-          //
-          console.log('From Realm', tasks);
-        }}>
-        <Text style={styles.buttonText}> Get From Realm</Text>
       </TouchableOpacity>
     </View>
   );

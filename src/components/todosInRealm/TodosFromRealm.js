@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -23,12 +23,15 @@ import {
   AlertIOS,
   Image,
   FlatList,
+  TouchableWithoutFeedback,
 } from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import ListItem from '../ListItem';
 
 import Realm from 'realm';
+import ListItemRealm from './ListItemRealm';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // schema for database objects
 const TaskSchema = {
@@ -51,81 +54,122 @@ const TodosFromRealm = ({navigation}) => {
   // const theme = useTheme();
 
   // input fields data
-  const [text, setText] = React.useState('');
-  const [description, setDescription] = React.useState('');
-  const [date, setDate] = React.useState('');
-
-  const [status, setStatus] = React.useState('checked');
+  const [user, setUser] = useState({});
 
   // realm related variables
   const [realm, setRealm] = React.useState(null);
+
   const [tasks, setTasks] = React.useState([]);
+  const [doneTask, setDoneTask] = React.useState([]);
+  const [doingTask, setDoingTask] = React.useState([]);
+
+  const [selected, setSelected] = useState('Todo');
 
   useEffect(() => {
-    (async () => {
-      // initialize realm...
-      const realm = await Realm.open({
-        path: 'myrealm1',
-        schema: [TaskSchema],
-      }).then(realm => {
-        // load data in the database...
-        const tasks = realm.objects('Task1');
+    const unsubscribe = navigation.addListener('focus', () => {
+      //console.log('use Effect called in Todos from backstack');
+      (async () => {
+        // initialize realm...
+        const realm = await Realm.open({
+          path: 'myrealm1',
+          schema: [TaskSchema],
+        }).then(realm => {
+          // load data in the database...
+          const tasks = realm.objects('Task1');
 
-        // set variable for tasks read from database
-        setTasks([...tasks]);
-
-        // get realm instance to use later in app
-        setRealm(realm);
-
-        // set up listener to update task list when the
-        // data is updated
-        try {
-          tasks.addListener(() => {
-            setTasks([...tasks]);
+          // set values to Todo
+          let todoList = tasks.filter(function (item) {
+            return item.status === 'Todo';
           });
-        } catch (error) {
-          console.error(`Error updating tasks: ${error}`);
-        }
-      });
-    })();
+
+          setTasks(todoList);
+
+          // set values to Done
+          let doneList = tasks.filter(function (item) {
+            return item.status === 'Done';
+          });
+          //console.log('done', doneList);
+          setDoneTask(doneList);
+
+          // set values to Done
+          let doingList = tasks.filter(function (item) {
+            return item.status === 'Doing';
+          });
+          //console.log('doing', doingList);
+          setDoingTask(doingList);
+
+          // get realm instance to use later in app
+          setRealm(realm);
+
+          // set up listener to update task list when the
+          // data is updated
+          // try {
+          //   tasks.addListener(() => {
+          //     let todoList = tasks.filter(function (item) {
+          //       return item.status === 'Todo';
+          //     });
+          //     console.log('todolist', todoList);
+
+          //     setTasks(todoList);
+
+          //     let doneList = tasks.filter(function (item) {
+          //       return item.status === 'Done';
+          //     });
+          //     //console.log('done', doneList);
+          //     setDoneTask(doneList);
+
+          //     let doingList = tasks.filter(function (item) {
+          //       return item.status === 'Doing';
+          //     });
+          //     //console.log('doing', doingList);
+          //     setDoingTask(doingList);
+          //   });
+          // } catch (error) {
+          //   console.error(`Error updating tasks: ${error}`);
+          // }
+        });
+      })();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  useEffect(() => {
+    //console.log('use Effect called in Todos');
+    // getTodosFromAsyncStorage();
+    //console.log('todos loaded from useEffect', todos);
+    getUserDetailFromAsyncSrorage();
   }, []);
+
+  const getUserDetailFromAsyncSrorage = async () => {
+    try {
+      const value = await AsyncStorage.getItem('user');
+      if (value !== null) {
+        // We have data!!
+        setUser(JSON.parse(value));
+        //console.log('from AS Todos fetching Saved User', JSON.parse(value));
+      }
+    } catch (error) {
+      // Error retrieving data
+      //console.log('from AS Todos fetching Saved user ERROR!');
+    }
+  };
 
   /**
    * deleting of tasks must happen in a transaction, we just
    * need the id of the task to delete
    */
-  const deleteTask = task => {
-    realm.write(() => {
-      try {
-        let myTask = realm.objectForPrimaryKey('Task1', task._id);
-        realm.delete(myTask);
-        myTask = null;
-        realm.refresh();
-      } catch (error) {
-        console.log('delete', error);
-      }
-    });
-  };
-
-  /**
-   * get the values from the local state and add a new
-   * task to the database
-   */
-  let task;
-  const adddTask = () => {
-    realm.write(() => {
-      task = realm.create('Task1', {
-        _id: Date.now(),
-        name: text,
-        description: description,
-        dueDate: date,
-        status: status == 'checked' ? 'Closed' : 'Open',
-      });
-    });
-
-    setText('');
-    setStatus('');
-  };
+  // const deleteTask = task => {
+  //   realm.write(() => {
+  //     try {
+  //       let myTask = realm.objectForPrimaryKey('Task1', task._id);
+  //       realm.delete(myTask);
+  //       myTask = null;
+  //       realm.refresh();
+  //     } catch (error) {
+  //       console.log('delete', error);
+  //     }
+  //   });
+  // };
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -137,20 +181,63 @@ const TodosFromRealm = ({navigation}) => {
         <View style={styles.topContainer}>
           <View style={styles.headerContainer}>
             <View style={styles.header}>
-              <Text style={styles.headerText}>{`Hello, Prakash`}</Text>
+              <Text
+                style={styles.headerText}>{`Hello, ${user.firstName}`}</Text>
             </View>
           </View>
         </View>
         <View style={styles.bottomContainer}>
           <View style={styles.tabContainer}>
             <View>
-              <Text style={styles.tabItemText}>Todo</Text>
+              <TouchableOpacity>
+                <Text
+                  style={
+                    selected == 'Todo'
+                      ? styles.tabItemTextSelected
+                      : styles.tabItemText
+                  }
+                  onPress={() => {
+                    //
+                    //showTodoScreen();
+                    setSelected('Todo');
+                  }}>
+                  Todo
+                </Text>
+              </TouchableOpacity>
             </View>
             <View>
-              <Text style={styles.tabItemTextDone}>Done</Text>
+              <TouchableOpacity>
+                <Text
+                  style={
+                    selected == 'Done'
+                      ? styles.tabItemTextSelected
+                      : styles.tabItemText
+                  }
+                  onPress={() => {
+                    //
+                    //showDoneScreen();
+                    setSelected('Done');
+                  }}>
+                  Done
+                </Text>
+              </TouchableOpacity>
             </View>
             <View>
-              <Text style={styles.tabItemTextDoing}>Doing</Text>
+              <TouchableOpacity>
+                <Text
+                  style={
+                    selected == 'Doing'
+                      ? styles.tabItemTextSelected
+                      : styles.tabItemText
+                  }
+                  onPress={() => {
+                    //
+                    //showDoingScreen();
+                    setSelected('Doing');
+                  }}>
+                  Doing
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
           <View style={styles.flatListContainer}>
@@ -160,34 +247,52 @@ const TodosFromRealm = ({navigation}) => {
               </View>
             )}
             <FlatList
-              data={tasks}
+              data={
+                selected === 'Todo'
+                  ? tasks
+                  : selected === 'Done'
+                  ? doneTask
+                  : doingTask
+              }
               renderItem={({item}) => {
                 //console.log('inside flat List', item);
                 return (
-                  <View style={styles.listContainer}>
-                    <View style={styles.listItem}>
-                      <View style={styles.imageView}>
-                        <Image
-                          source={require('../../assets/suitcase.png')}
-                          style={styles.icon}
-                          onPress={() => {
-                            //
-                          }}
-                        />
-                      </View>
-                      <View style={styles.textBox}>
-                        <View style={styles.titleBox}>
-                          <Text style={styles.todoTitle}>{item.name}</Text>
-                          <Text style={styles.todoDueDate}>{item.dueDate}</Text>
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      //
+                      navigation.navigate('Add Todo realm', {
+                        edit: true,
+                        taskToUpdate: item,
+                      });
+                    }}>
+                    {/* <ListItemRealm {...item} /> */}
+                    <View style={styles.listContainer}>
+                      <View style={styles.listItem}>
+                        <View style={styles.imageView}>
+                          <Image
+                            source={require('../../assets/suitcase.png')}
+                            style={styles.icon}
+                            onPress={() => {
+                              //
+                            }}
+                          />
                         </View>
-                        <View style={styles.descriptionBox}>
-                          <Text style={styles.descriptionText}>
-                            {item.description}
-                          </Text>
+                        <View style={styles.textBox}>
+                          <View style={styles.titleBox}>
+                            <Text style={styles.todoTitle}>{item.name}</Text>
+                            <Text style={styles.todoDueDate}>
+                              {item.dueDate}
+                            </Text>
+                          </View>
+                          <View style={styles.descriptionBox}>
+                            <Text style={styles.descriptionText}>
+                              {item.description}
+                            </Text>
+                          </View>
                         </View>
                       </View>
                     </View>
-                  </View>
+                  </TouchableWithoutFeedback>
                 );
               }}
             />
@@ -195,7 +300,9 @@ const TodosFromRealm = ({navigation}) => {
           <TouchableOpacity
             style={styles.loginButton}
             onPress={() => {
-              navigation.navigate('Add Todo realm');
+              navigation.navigate('Add Todo realm', {
+                edit: false,
+              });
             }}>
             <Text style={styles.buttonText}>+</Text>
           </TouchableOpacity>
@@ -261,7 +368,12 @@ const styles = StyleSheet.create({
   tabItemText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#CCC',
+  },
+  tabItemTextSelected: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#3D0DAD',
   },
   tabItemTextDone: {
     fontSize: 18,
@@ -297,8 +409,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#3D0DAD',
     height: 60,
     position: 'absolute',
-    top: 520,
-    left: 300,
+    bottom: 40,
+    right: 35,
     color: '#FFFFFF',
     borderRadius: 100,
   },

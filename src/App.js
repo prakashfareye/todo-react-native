@@ -52,11 +52,6 @@ const App = () => {
   });
 
   return (
-    // <SafeAreaView style={backgroundStyle}>
-    //   <StatusBar
-    //     barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-    //     backgroundColor={backgroundStyle.backgroundColor}
-    //   />
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen
