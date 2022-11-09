@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Node} from 'react';
 import {NavigationContainer, StackActions} from '@react-navigation/native';
 import Realm from 'realm';
-import {TaskSchema} from '../database/schema/TaskSchema';
+import {TaskSchema} from '../../database/schema/TaskSchema';
 
 import {
   StyleSheet,
@@ -33,14 +33,10 @@ const AddTodo = ({navigation}) => {
   const [dateValidError, setDateValidError] = useState('');
 
   useEffect(() => {
-    //console.log('use Effect called in Todos');
-    // getTodosFromAsyncStorage();
     getFromAsync();
   }, []);
 
   useEffect(() => {
-    //console.log('use Effect called in Todos');
-    // getTodosFromAsyncStorage();
     validateDate();
   });
 
@@ -60,17 +56,13 @@ const AddTodo = ({navigation}) => {
       tempDate.getDate();
     setDueDate(fDate);
     setShow(!show);
-    console.log(fDate);
   };
 
   const validateDate = () => {
     var now = new Date();
     now.setHours(0, 0, 0, 0);
-    console.log(now);
-    console.log(date);
     if (date < now) {
       setDateValidError('Selected date is in the past');
-      //console.log('Selected date is in the past');
     } else {
       setDateValidError('');
     }
@@ -87,22 +79,12 @@ const AddTodo = ({navigation}) => {
       dueDate: dueDate,
       status: false,
     };
-    console.log('Todos before addition', todos);
     setTodos([...todos, todo]);
-    console.log('Todos after addition', todos);
-
-    console.log('Current Todo', todo);
-
     AsyncStorage.setItem('todos', JSON.stringify(todos))
       .then(json => {
-        console.log('Saving Todo Success!!');
         //navigation.dispatch(StackActions.pop(1));
       })
       .catch(error => console.log('Empty Todos creation in AS error!'));
-    // // show Alert
-    // alert('Todo Saved');
-    // pop the backstack
-    //navigation.dispatch(StackActions.pop(1));
   };
 
   const getFromAsync = async () => {
@@ -111,7 +93,6 @@ const AddTodo = ({navigation}) => {
       if (value !== null) {
         // We have data!!
         setTodos(JSON.parse(value));
-        console.log('from As TodoList', JSON.parse(value));
       }
     } catch (error) {
       // Error retrieving data
@@ -174,7 +155,7 @@ const AddTodo = ({navigation}) => {
         />
         <TouchableOpacity style={styles.wrapperIcon} onPress={changeShowMode}>
           <Image
-            source={require('../assets/calender.png')}
+            source={require('../../assets/calender.png')}
             style={styles.icon}
             onPress={() => {
               //
@@ -219,7 +200,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginLeft: 20,
     marginRight: 20,
-    borderBottomWidth: 0.6,
+    borderBottomWidth: 1,
     underlineColor: '#000000',
     activeUnderlineColor: '#000000',
     paddingEnd: 25,

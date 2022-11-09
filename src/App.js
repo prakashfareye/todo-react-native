@@ -30,8 +30,8 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import Login from './components/Login';
-import Todos from './components/Todos';
-import AddTodo from './components/AddTodo';
+import Todos from './components/todosInAsyncStorage/Todos';
+import AddTodo from './components/todosInAsyncStorage/AddTodo';
 import TodosFromRealm from './components/todosInRealm/TodosFromRealm';
 import AddTodorealm from './components/todosInRealm/AddTodorealm';
 

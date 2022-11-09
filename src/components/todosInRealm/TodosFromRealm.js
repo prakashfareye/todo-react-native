@@ -27,7 +27,7 @@ import {
 } from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import ListItem from '../ListItem';
+import ListItem from '../todosInAsyncStorage/ListItem';
 
 import Realm from 'realm';
 import ListItemRealm from './ListItemRealm';
@@ -51,9 +51,7 @@ const TodosFromRealm = ({navigation}) => {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
   const isDarkMode = useColorScheme() === 'dark';
-  // const theme = useTheme();
 
-  // input fields data
   const [user, setUser] = useState({});
 
   // realm related variables
@@ -134,9 +132,6 @@ const TodosFromRealm = ({navigation}) => {
   }, [navigation]);
 
   useEffect(() => {
-    //console.log('use Effect called in Todos');
-    // getTodosFromAsyncStorage();
-    //console.log('todos loaded from useEffect', todos);
     getUserDetailFromAsyncSrorage();
   }, []);
 
@@ -144,32 +139,12 @@ const TodosFromRealm = ({navigation}) => {
     try {
       const value = await AsyncStorage.getItem('user');
       if (value !== null) {
-        // We have data!!
         setUser(JSON.parse(value));
-        //console.log('from AS Todos fetching Saved User', JSON.parse(value));
       }
     } catch (error) {
-      // Error retrieving data
-      //console.log('from AS Todos fetching Saved user ERROR!');
+      console.log('from AS Todos fetching Saved user ERROR!');
     }
   };
-
-  /**
-   * deleting of tasks must happen in a transaction, we just
-   * need the id of the task to delete
-   */
-  // const deleteTask = task => {
-  //   realm.write(() => {
-  //     try {
-  //       let myTask = realm.objectForPrimaryKey('Task1', task._id);
-  //       realm.delete(myTask);
-  //       myTask = null;
-  //       realm.refresh();
-  //     } catch (error) {
-  //       console.log('delete', error);
-  //     }
-  //   });
-  // };
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -214,8 +189,6 @@ const TodosFromRealm = ({navigation}) => {
                       : styles.tabItemText
                   }
                   onPress={() => {
-                    //
-                    //showDoneScreen();
                     setSelected('Done');
                   }}>
                   Done
@@ -231,8 +204,6 @@ const TodosFromRealm = ({navigation}) => {
                       : styles.tabItemText
                   }
                   onPress={() => {
-                    //
-                    //showDoingScreen();
                     setSelected('Doing');
                   }}>
                   Doing
@@ -255,11 +226,9 @@ const TodosFromRealm = ({navigation}) => {
                   : doingTask
               }
               renderItem={({item}) => {
-                //console.log('inside flat List', item);
                 return (
                   <TouchableWithoutFeedback
                     onPress={() => {
-                      //
                       navigation.navigate('Add Todo realm', {
                         edit: true,
                         taskToUpdate: item,

@@ -8,7 +8,7 @@ const ListItem = item => {
       <View style={styles.listItem}>
         <View style={styles.imageView}>
           <Image
-            source={require('../assets/suitcase.png')}
+            source={require('../../assets/suitcase.png')}
             style={styles.icon}
             onPress={() => {
               //

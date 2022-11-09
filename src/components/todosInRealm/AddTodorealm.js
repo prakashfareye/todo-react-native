@@ -140,14 +140,11 @@ const AddTodo = ({route, navigation}) => {
       tempDate.getDate();
     setDueDate(fDate);
     setShow(!show);
-    console.log(fDate);
   };
 
   const validateDate = () => {
     var now = new Date();
     now.setHours(0, 0, 0, 0);
-    console.log(now);
-    console.log(date);
     if (date < now) {
       setDateValidError('Selected date is in the past');
       //console.log('Selected date is in the past');

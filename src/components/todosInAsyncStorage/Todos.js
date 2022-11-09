@@ -33,9 +33,6 @@ const Todos = ({navigation}) => {
   const [user, setUser] = useState({});
 
   useEffect(() => {
-    //console.log('use Effect called in Todos');
-    // getTodosFromAsyncStorage();
-    //console.log('todos loaded from useEffect', todos);
     getUserDetailFromAsyncSrorage();
   }, []);
 
@@ -143,7 +140,6 @@ const Todos = ({navigation}) => {
           <TouchableOpacity
             style={styles.loginButton}
             onPress={() => {
-              console.log('on Press of Add Todo');
               navigation.navigate('AddTodo');
               //navigation.navigate('Realm Testing');
             }}>
